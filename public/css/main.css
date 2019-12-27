@@ -101,4 +101,9 @@ body {
   display: inline;
 }
 
+/*-------------------------------------------------*/
+
+.mouse-off {
+  pointer-events: none;
+}
 
