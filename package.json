@@ -9,6 +9,6 @@
     "watch": "parcel watch --no-source-maps -d public/js -o memora.js lib/app.js"
   },
   "dependencies": {
-    "parcel-bundler": "1.12.4"
+    "parcel-bundler": "1.12.5"
   }
 }
