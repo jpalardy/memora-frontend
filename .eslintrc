@@ -4,18 +4,15 @@ rules:
   comma-dangle: ["error", "always-multiline"]
   func-names: ["error", "as-needed"]
   space-before-function-paren: "off"
-  arrow-parens: ["error", "as-needed"]
-  arrow-body-style: ["warn", "as-needed", {"requireReturnForObjectLiteral": true}]
+  arrow-parens: "off"
+  arrow-body-style: "off"
   max-len: ["warn", 150]
   generator-star-spacing: "off"
   object-curly-spacing: "off"
-  no-param-reassign: "off"
+  no-param-reassign: ["error", {"props": false}]
   function-paren-newline: "off"
   class-methods-use-this: "off"
-  object-curly-newline: "off"
-  no-shadow: "off"
-  implicit-arrow-linebreak: "off"
+  object-curly-newline: ["error", {"multiline": true}]
 env:
   es6: true
 extends: airbnb-base
-// npm install eslint-config-airbnb-base
