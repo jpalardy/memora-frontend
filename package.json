@@ -5,7 +5,7 @@
   "author": "Jonathan Palardy",
   "license": "MIT",
   "devDependencies": {
-    "esbuild": "0.12.24",
+    "esbuild": "0.12.25",
     "eslint": "7.32.0",
     "eslint-config-airbnb-base": "14.2.1",
     "eslint-plugin-import": "2.24.2"
