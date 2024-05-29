@@ -1,13 +1,8 @@
 {
-  "name": "memora-frontend",
-  "version": "0.3.0",
-  "description": "Memora is a flashcard app, like [Supermemo](https://www.supermemo.com/), [Anki](http://ankisrs.net/), or one of the other software you can use to do [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition).",
-  "author": "Jonathan Palardy",
-  "license": "MIT",
   "devDependencies": {
-    "esbuild": "0.20.2",
-    "eslint": "8.57.0",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-plugin-import": "2.29.1"
+    "@elm-tooling/elm-language-server": "^2.8.0",
+    "elm": "^0.19.1-6",
+    "elm-format": "^0.8.7",
+    "uglify-js": "^3.17.4"
   }
 }
