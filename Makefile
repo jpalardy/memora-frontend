@@ -20,3 +20,7 @@ watch:
 clean:
 	rm -rf elm-stuff/ $(OUTPUT)
 
+.PHONE: deep-clean
+deep-clean: clean
+	rm -rf node_modules/
+
