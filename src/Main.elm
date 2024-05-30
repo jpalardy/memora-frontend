@@ -204,13 +204,9 @@ update msg model =
                             (\deck ->
                                 deck.cards
                                     |> List.filter
-                                        (\card ->
-                                            case card.last of
-                                                Nothing ->
-                                                    True
-
-                                                Just last ->
-                                                    daysBetween model.now last > 0
+                                        (.last
+                                            >> Maybe.map (\last -> daysBetween model.now last > 0)
+                                            >> Maybe.withDefault True
                                         )
                                     |> Random.List.shuffle
                             )
