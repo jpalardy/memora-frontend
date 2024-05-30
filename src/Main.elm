@@ -226,7 +226,7 @@ update msg model =
                 newDecks =
                     List.map2 (\deck cards -> { deck | cards = cards }) decks deckCards
             in
-            ( { model | decks = Success newDecks }, Cmd.none )
+            ( { model | decks = Success newDecks, focus = None }, Cmd.none )
 
         Select card ->
             ( { model | focus = Selected card }, Cmd.none )
