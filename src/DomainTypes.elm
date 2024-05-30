@@ -21,3 +21,10 @@ type alias Deck =
     { filename : String
     , cards : List Card
     }
+
+
+type RemoteData err a
+    = NotAsked
+    | Loading
+    | Failure err
+    | Success a

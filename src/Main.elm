@@ -45,7 +45,7 @@ type Focus
 
 type alias Model =
     { now : Time.Posix
-    , decks : List Deck
+    , decks : RemoteData Http.Error (List Deck)
     , focus : Focus
     , mouseDisabled : Bool
     }
@@ -172,7 +172,7 @@ port scrollToSelected : () -> Cmd msg
 init : Int -> ( Model, Cmd Msg )
 init now =
     ( { now = Time.millisToPosix now
-      , decks = []
+      , decks = Loading
       , focus = None
       , mouseDisabled = False
       }
@@ -186,7 +186,12 @@ update msg model =
         keyboardFocus direction =
             let
                 newFocus =
-                    findNewFocus model.decks model.focus direction
+                    case model.decks of
+                        Success decks ->
+                            findNewFocus decks model.focus direction
+
+                        _ ->
+                            model.focus
             in
             ( { model | focus = newFocus, mouseDisabled = True }, scrollToSelected () )
     in
@@ -206,8 +211,8 @@ update msg model =
             in
             ( model, cmd )
 
-        GotDecks (Err _) ->
-            ( model, Cmd.none )
+        GotDecks (Err err) ->
+            ( { model | decks = Failure err }, Cmd.none )
 
         PostedDecks _ ->
             ( model, Server.getDecks GotDecks )
@@ -217,7 +222,7 @@ update msg model =
                 newDecks =
                     List.map2 (\deck cards -> { deck | cards = cards }) decks deckCards
             in
-            ( { model | decks = newDecks }, Cmd.none )
+            ( { model | decks = Success newDecks }, Cmd.none )
 
         Select card ->
             ( { model | focus = Selected card }, Cmd.none )
@@ -261,7 +266,12 @@ update msg model =
             ( model, Cmd.none )
 
         PreventedKeyDown "Save" ->
-            ( model, Server.postDecks model.decks model.now PostedDecks )
+            case model.decks of
+                Success decks ->
+                    ( model, Server.postDecks decks model.now PostedDecks )
+
+                _ ->
+                    ( model, Cmd.none )
 
         PreventedKeyDown "ArrowUp" ->
             keyboardFocus Up
@@ -317,10 +327,15 @@ gradeSelectedCard newGrade model =
                 updateDecks decks =
                     List.map (\deck -> { deck | cards = List.map mapper deck.cards }) decks
             in
-            { model
-                | decks = updateDecks model.decks
-                , focus = mapFocus mapper model.focus
-            }
+            case model.decks of
+                Success decks ->
+                    { model
+                        | decks = Success <| updateDecks decks
+                        , focus = mapFocus mapper model.focus
+                    }
+
+                _ ->
+                    model
 
 
 
@@ -355,8 +370,30 @@ relativeTime now last =
 
 view : Model -> Html Msg
 view model =
-    div [ class "container", classList [ ( "mouse-off", model.mouseDisabled ) ], onMouseUp Unflip ] <|
-        List.map (viewDeck model.now model.focus) model.decks
+    case model.decks of
+        Success decks ->
+            viewDecks model.now model.focus model.mouseDisabled decks
+
+        Failure err ->
+            let
+                errorMsg =
+                    case err of
+                        Http.BadBody body ->
+                            body
+
+                        _ ->
+                            "Cannot fetch decks"
+            in
+            div [ class "error-banner" ] [ text errorMsg ]
+
+        _ ->
+            div [] []
+
+
+viewDecks : Time.Posix -> Focus -> Bool -> List Deck -> Html Msg
+viewDecks now focus mouseDisabled decks =
+    div [ class "container", classList [ ( "mouse-off", mouseDisabled ) ], onMouseUp Unflip ] <|
+        List.map (viewDeck now focus) decks
 
 
 viewDeck : Time.Posix -> Focus -> Deck -> Html Msg
