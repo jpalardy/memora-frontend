@@ -12,7 +12,7 @@ type Grade
 type alias Card =
     { question : String
     , answer : String
-    , last : Time.Posix
+    , last : Maybe Time.Posix
     , grade : Grade
     }
 

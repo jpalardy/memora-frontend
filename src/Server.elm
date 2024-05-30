@@ -58,7 +58,7 @@ cardDecoder =
     Decode.succeed Card
         |> Pipeline.required "question" Decode.string
         |> Pipeline.required "answer" Decode.string
-        |> Pipeline.required "last" Iso8601.decoder
+        |> Pipeline.optional "last" (Decode.maybe Iso8601.decoder) Nothing
         |> Pipeline.hardcoded Neutral
 
 
@@ -113,8 +113,11 @@ generateDeckUpdates decks now =
 
                 Passed ->
                     let
+                        daysSinceLast =
+                            card.last |> Maybe.map (daysBetween now) |> Maybe.withDefault 1
+
                         ( days, newSeed ) =
-                            Random.step (daysBetween now card.last |> doubleSpacedGenerator) currentSeed
+                            Random.step (doubleSpacedGenerator daysSinceLast) currentSeed
                     in
                     ( newSeed, [ ( card.question, { mark = 1, next = days |> addDays now |> isoDay } ) ] )
 

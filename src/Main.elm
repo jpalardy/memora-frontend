@@ -203,7 +203,15 @@ update msg model =
                         |> List.map
                             (\deck ->
                                 deck.cards
-                                    |> List.filter (\card -> daysBetween model.now card.last > 0)
+                                    |> List.filter
+                                        (\card ->
+                                            case card.last of
+                                                Nothing ->
+                                                    True
+
+                                                Just last ->
+                                                    daysBetween model.now last > 0
+                                        )
                                     |> Random.List.shuffle
                             )
                         |> Random.Extra.sequence
@@ -435,7 +443,7 @@ viewCard now focus card =
         , onMouseDown <| Flip card
         ]
         [ span [ class "text" ] [ Markdown.toHtmlWith unsanitized [] visibleText ]
-        , span [ class "preview" ] [ text <| relativeTime now card.last ]
+        , span [ class "preview" ] [ card.last |> Maybe.map (relativeTime now) |> Maybe.withDefault "(new card)" |> text ]
         ]
 
 
