@@ -6,6 +6,7 @@ import DomainTypes exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Keyed
 import Http
 import Json.Decode as Decode
 import List.Extra
@@ -405,11 +406,11 @@ viewDeck now focus deck =
     div [ class "deck" ]
         [ h2 [] [ text deck.filename ]
         , h3 [ class "subtext" ] [ text <| pluralize (List.length deck.cards) "card" "cards" ]
-        , div [ class "cards" ] <| List.map (viewCard now focus) deck.cards
+        , Html.Keyed.node "div" [ class "cards" ] <| List.map (viewCard now focus) deck.cards
         ]
 
 
-viewCard : Time.Posix -> Focus -> Card -> Html Msg
+viewCard : Time.Posix -> Focus -> Card -> ( String, Html Msg )
 viewCard now focus card =
     let
         defaults =
@@ -428,7 +429,8 @@ viewCard now focus card =
         selected =
             (focus == Selected card) || (focus == Flipped card)
     in
-    div
+    ( card.question
+    , div
         [ class "card"
         , classList
             [ ( "selected", selected )
@@ -441,6 +443,7 @@ viewCard now focus card =
         [ span [ class "text" ] [ Markdown.toHtmlWith unsanitized [] visibleText ]
         , span [ class "preview" ] [ card.last |> Maybe.map (relativeTime now) |> Maybe.withDefault "(new card)" |> text ]
         ]
+    )
 
 
 
