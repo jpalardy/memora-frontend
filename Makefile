@@ -6,7 +6,7 @@ OUTPUT = public/js/app.js
 
 .PHONY: build
 build: $(ELMs)
-	npm exec -- elm make src/Main.elm --output $(OUTPUT)
+	npm exec -- elm make --debug src/Main.elm --output $(OUTPUT)
 
 optimize: $(ELMs)
 	npm exec -- elm make src/Main.elm --optimize --output $(OUTPUT)
@@ -14,7 +14,7 @@ optimize: $(ELMs)
 
 .PHONY: watch
 watch:
-	ls $(ELMs) | entr -c -s 'make -s'
+	ls $(ELMs) | entr -c -s 'ding make -s'
 
 .PHONY: clean
 clean:
