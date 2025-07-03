@@ -28,7 +28,6 @@ cardsPercolumn =
 type Msg
     = GotDecks (Result Http.Error (List Deck))
     | GotShuffledDecks (List Deck) (List (List Card))
-    | PostedDecks (Result Http.Error ())
     | Select Card
     | Flip Card
     | Unflip
@@ -219,9 +218,6 @@ update msg model =
         GotDecks (Err err) ->
             ( { model | decks = Failure err }, Cmd.none )
 
-        PostedDecks _ ->
-            ( model, Server.getDecks GotDecks )
-
         GotShuffledDecks decks deckCards ->
             let
                 newDecks =
@@ -273,7 +269,7 @@ update msg model =
         PreventedKeyDown "Save" ->
             case model.decks of
                 Success decks ->
-                    ( model, Server.postDecks decks model.now PostedDecks )
+                    ( model, Server.postDecks decks model.now GotDecks )
 
                 _ ->
                     ( model, Cmd.none )

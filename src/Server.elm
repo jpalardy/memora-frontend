@@ -26,7 +26,7 @@ getDecks msg =
         }
 
 
-postDecks : List Deck -> Time.Posix -> (Result Http.Error () -> msg) -> Cmd msg
+postDecks : List Deck -> Time.Posix -> (Result Http.Error (List Deck) -> msg) -> Cmd msg
 postDecks decks now msg =
     case generateDeckUpdates decks now of
         [] ->
@@ -36,7 +36,7 @@ postDecks decks now msg =
             Http.post
                 { url = "decks"
                 , body = updates |> Json.Encode.list encodeDeckUpdate |> Http.jsonBody
-                , expect = Http.expectWhatever msg
+                , expect = Http.expectJson msg (Decode.list deckDecoder)
                 }
 
 
