@@ -9,6 +9,7 @@ import Json.Decode.Pipeline as Pipeline
 import Json.Encode
 import PosixUtils exposing (..)
 import Random
+import Scheduling
 import Time
 
 
@@ -102,32 +103,10 @@ generateDeckUpdates decks now =
         seed =
             now |> Time.posixToMillis |> Random.initialSeed
 
-        -- "doubling" d : d * 1.8..2.2
-        doubleSpacedGenerator d =
-            Random.int (18 * d // 10) (22 * d // 10)
-
-        updateForCard currentSeed card =
-            case card.grade of
-                Neutral ->
-                    ( seed, [] )
-
-                Passed ->
-                    let
-                        daysSinceLast =
-                            card.last |> Maybe.map (daysBetween now) |> Maybe.withDefault 1
-
-                        ( days, newSeed ) =
-                            Random.step (doubleSpacedGenerator daysSinceLast) currentSeed
-                    in
-                    ( newSeed, [ ( card.question, { mark = 1, next = days |> addDays now |> isoDay } ) ] )
-
-                Failed ->
-                    ( seed, [ ( card.question, { mark = 0, next = isoDay now } ) ] )
-
         updatesForDeck currentSeed deck =
             let
                 ( nextSeed, deckUpdates ) =
-                    mapWithSeed currentSeed updateForCard deck.cards
+                    mapWithSeed currentSeed (Scheduling.update now) deck.cards
             in
             ( nextSeed
             , { filename = deck.filename, updates = deckUpdates |> List.concat |> Dict.fromList }
