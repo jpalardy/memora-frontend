@@ -16,6 +16,10 @@ optimize: $(ELMs)
 watch:
 	ls $(ELMs) | entr -c -s 'ding make -s'
 
+.PHONY: test
+test:
+	npm exec -- elm-test
+
 .PHONY: clean
 clean:
 	rm -rf elm-stuff/ $(OUTPUT)
