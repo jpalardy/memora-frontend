@@ -49,18 +49,23 @@ postDecks decks now msg =
 
 deckDecoder : Decode.Decoder Deck
 deckDecoder =
-    Decode.succeed Deck
-        |> Pipeline.required "filename" Decode.string
-        |> Pipeline.required "cards" (Decode.list cardDecoder)
+    Decode.field "filename" Decode.string
+        |> Decode.andThen
+            (\filename ->
+                Decode.succeed Deck
+                    |> Pipeline.required "filename" (Decode.succeed filename)
+                    |> Pipeline.required "cards" (Decode.list (cardDecoder filename))
+            )
 
 
-cardDecoder : Decode.Decoder Card
-cardDecoder =
+cardDecoder : String -> Decode.Decoder Card
+cardDecoder filename =
     Decode.succeed Card
         |> Pipeline.required "question" Decode.string
         |> Pipeline.required "answer" Decode.string
         |> Pipeline.optional "last" (Decode.maybe Iso8601.decoder) Nothing
         |> Pipeline.hardcoded Neutral
+        |> Pipeline.hardcoded filename
 
 
 

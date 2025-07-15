@@ -14,6 +14,9 @@ type alias Card =
     , answer : String
     , last : Maybe Time.Posix
     , grade : Grade
+
+    -- `filename` not strictly necessary, but differentiates cards across decks
+    , filename : String
     }
 
 
